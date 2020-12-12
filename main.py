@@ -121,36 +121,4 @@ class NFADesign:
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    rb = DFARulebook([
-        FARule(1, 'a', 2), FARule(1, 'b', 1),
-        FARule(2, 'a', 2), FARule(2, 'b', 3),
-        FARule(3, 'a', 3), FARule(3, 'b', 3),
-    ])
-    dfa = DFADesign(1, [3], rb)
-    assert not dfa.accept("a")
-    assert not dfa.accept("baa")
-    assert dfa.accept("baba")
-
-    rb = NFARulebook([
-        FARule(1, 'a', 1), FARule(1, 'b', 1), FARule(1, 'b', 2),
-        FARule(2, 'a', 3), FARule(2, 'b', 3),
-        FARule(3, 'a', 4), FARule(3, 'b', 4),
-    ])
-    nfa_design = NFADesign(1, [4], rb)
-    assert nfa_design.accept("bab")
-    assert nfa_design.accept("bbbbb")
-    assert not nfa_design.accept("bbabb")
-
-    rb = NFARulebook([
-        FARule(1, None, 2), FARule(1, None, 4),
-        FARule(2, 'a', 3),
-        FARule(3, 'a', 2),
-        FARule(4, 'a', 5),
-        FARule(5, 'a', 6),
-        FARule(6, 'a', 4),
-    ])
-    nfa_design = NFADesign(1, [2, 4], rb)
-    assert nfa_design.accept('aa')
-    assert nfa_design.accept('aaa')
-    assert not nfa_design.accept('aaaaa')
-    assert nfa_design.accept('aaaaaa')
+    pass
