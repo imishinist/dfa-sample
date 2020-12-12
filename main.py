@@ -59,6 +59,55 @@ class DFADesign:
         return d.accepting()
 
 
+class NFARulebook:
+    def __init__(self, rules):
+        self.rules = rules
+
+    def next_states(self, states, char):
+        flatten = lambda x: [z for y in x for z in
+                             (flatten(y) if hasattr(y, '__iter__') and not isinstance(y, str) else (y,))]
+        return set(list(flatten(map(lambda state: self.follow_rules_for(state, char), states))))
+
+    def follow_rules_for(self, state, char):
+        return list(map(lambda rule: rule.follow(), self.rules_for(state, char)))
+
+    def rules_for(self, state, char):
+        r = list(self.rules)
+        return filter(lambda rule: rule.can_applies_to(state, char), r)
+
+
+class NFA:
+    def __init__(self, current_states, accept_states, rulebook):
+        self.current_states = current_states
+        self.accept_states = accept_states
+        self.rulebook = rulebook
+
+    def accepting(self):
+        return not self.current_states.isdisjoint(self.accept_states)
+
+    def read_character(self, char):
+        self.current_states = self.rulebook.next_states(self.current_states, char)
+
+    def read_string(self, string):
+        for c in string:
+            self.read_character(c)
+
+
+class NFADesign:
+    def __init__(self, start_state, accept_states, rulebook):
+        self.start_state = start_state
+        self.accept_states = accept_states
+        self.rulebook = rulebook
+
+    def to_nfa(self):
+        return NFA({self.start_state}, self.accept_states, self.rulebook)
+
+    def accept(self, string):
+        n = self.to_nfa()
+        n.read_string(string)
+        return n.accepting()
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     rb = DFARulebook([
@@ -70,3 +119,13 @@ if __name__ == '__main__':
     print(dfa.accept("a"))
     print(dfa.accept("baa"))
     print(dfa.accept("baba"))
+
+    rb = NFARulebook([
+        FARule(1, 'a', 1), FARule(1, 'b', 1), FARule(1, 'b', 2),
+        FARule(2, 'a', 3), FARule(2, 'b', 3),
+        FARule(3, 'a', 4), FARule(3, 'b', 4),
+    ])
+    nfa_design = NFADesign(1, [4], rb)
+    print(nfa_design.accept("bab"))
+    print(nfa_design.accept("bbbbb"))
+    print(nfa_design.accept("bbabb"))
