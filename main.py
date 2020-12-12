@@ -13,7 +13,7 @@ class FARule:
         return self.next_state
 
     def inspect(self):
-        "#<FARule " + self.state.inspect + "--" + self.character + "--> " + self.next_state.inspect + ">"
+        return "#<FARule {} --{}--> {}>".format(self.state, self.character, self.next_state)
 
 
 class DFARulebook:
