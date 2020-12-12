@@ -71,6 +71,14 @@ class NFARulebook:
     def follow_rules_for(self, state, char):
         return list(map(lambda rule: rule.follow(), self.rules_for(state, char)))
 
+    def follow_free_moves(self, states):
+        more_states = self.next_states(states, None)
+
+        if more_states.issubset(states):
+            return states
+        else:
+            return self.follow_free_moves(states.union(more_states))
+
     def rules_for(self, state, char):
         r = list(self.rules)
         return filter(lambda rule: rule.can_applies_to(state, char), r)
@@ -82,11 +90,14 @@ class NFA:
         self.accept_states = accept_states
         self.rulebook = rulebook
 
+    def get_current_states(self):
+        return self.rulebook.follow_free_moves(self.current_states)
+
     def accepting(self):
-        return not self.current_states.isdisjoint(self.accept_states)
+        return not self.get_current_states().isdisjoint(self.accept_states)
 
     def read_character(self, char):
-        self.current_states = self.rulebook.next_states(self.current_states, char)
+        self.current_states = self.rulebook.next_states(self.get_current_states(), char)
 
     def read_string(self, string):
         for c in string:
@@ -129,3 +140,17 @@ if __name__ == '__main__':
     print(nfa_design.accept("bab"))
     print(nfa_design.accept("bbbbb"))
     print(nfa_design.accept("bbabb"))
+
+    rb = NFARulebook([
+        FARule(1, None, 2), FARule(1, None, 4),
+        FARule(2, 'a', 3),
+        FARule(3, 'a', 2),
+        FARule(4, 'a', 5),
+        FARule(5, 'a', 6),
+        FARule(6, 'a', 4),
+    ])
+    nfa_design = NFADesign(1, [2, 4], rb)
+    print(nfa_design.accept('aa'))
+    print(nfa_design.accept('aaa'))
+    print(nfa_design.accept('aaaaa'))
+    print(nfa_design.accept('aaaaaa'))
