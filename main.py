@@ -83,6 +83,9 @@ class NFARulebook:
         r = list(self.rules)
         return filter(lambda rule: rule.can_applies_to(state, char), r)
 
+    def alphabet(self):
+        return set(filter(None, map(lambda x: x.character, list(self.rules))))
+
 
 class NFA:
     def __init__(self, current_states, accept_states, rulebook):
@@ -110,13 +113,29 @@ class NFADesign:
         self.accept_states = accept_states
         self.rulebook = rulebook
 
-    def to_nfa(self):
-        return NFA({self.start_state}, self.accept_states, self.rulebook)
+    def to_nfa(self, current_states=None):
+        curr = {self.start_state} if current_states is None else current_states
+        return NFA(curr, self.accept_states, self.rulebook)
 
     def accept(self, string):
         n = self.to_nfa()
         n.read_string(string)
         return n.accepting()
+
+
+class NFASimulation:
+    def __init__(self, nfa_design):
+        self.nfa_design = nfa_design
+
+    def tap(self, x, f):
+        f(x)
+        return x
+
+    def next_state(self, state, char):
+        return self.tap(self.nfa_design.to_nfa(state), lambda nfa: nfa.read_character(char)).get_current_states()
+
+    def rules_for(self, state):
+        return list(map(lambda x: FARule(state, x, self.next_state(state, x)), self.nfa_design.rulebook.alphabet()))
 
 
 # Press the green button in the gutter to run the script.
