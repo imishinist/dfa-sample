@@ -14,7 +14,6 @@ class TestNFARulebook(unittest.TestCase):
             FARule(2, 'b', 3),
             FARule(3, 'b', 1), FARule(3, None, 2),
         ])
-        print(rulebook.alphabet())
         assert rulebook.alphabet() == {"a", "b"}
 
 
